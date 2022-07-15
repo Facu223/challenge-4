@@ -62,12 +62,23 @@ router.put("/users/:id", async (req, res) => {
     const id = req.params.id;
     const bookUpdated = req.body;
     const options = { new: true };
-    const data = await User.findByIdAndUpdate(id, bookUpdated, options);
-    if (data) {
-      res.status(200).json(data);
+    // Esta valifación fue agregada debido a que a la hora de editar un user,
+    // me permitia enviarle el valor null, a cualquiera de las propiedades.
+    if (
+      bookUpdated.company != null &&
+      bookUpdated.name != null &&
+      bookUpdated.email != null &&
+      bookUpdated.userName != null
+    ) {
+      const data = await User.findByIdAndUpdate(id, bookUpdated, options);
+      if (data) {
+        res.status(200).json(data);
+        return;
+      }
+    } else {
+      res.status(500).json(incorrectData);
       return;
     }
-    res.status(500).json(userNotFound);
   } catch (error) {
     res.status(500).json(incorrectData);
   }
